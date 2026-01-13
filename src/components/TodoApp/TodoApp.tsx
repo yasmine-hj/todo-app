@@ -21,8 +21,7 @@ import {
 } from "../styles";
 
 /**
- * Main To-Do application component.
- * Orchestrates task management and renders the UI.
+ * Main application component - orchestrates task management and renders the UI.
  */
 export function TodoApp() {
   const {

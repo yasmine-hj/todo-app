@@ -1,14 +1,7 @@
-/**
- * SVG icon components for the application.
- */
-
 interface IconProps {
   size?: number;
 }
 
-/**
- * Sun icon for light mode.
- */
 export function SunIcon({ size = 20 }: IconProps) {
   return (
     <svg
@@ -34,9 +27,6 @@ export function SunIcon({ size = 20 }: IconProps) {
   );
 }
 
-/**
- * Moon icon for dark mode.
- */
 export function MoonIcon({ size = 20 }: IconProps) {
   return (
     <svg
@@ -54,9 +44,6 @@ export function MoonIcon({ size = 20 }: IconProps) {
   );
 }
 
-/**
- * Close/X icon for dismissing elements.
- */
 export function CloseIcon({ size = 16 }: IconProps) {
   return (
     <svg
@@ -73,9 +60,6 @@ export function CloseIcon({ size = 16 }: IconProps) {
   );
 }
 
-/**
- * Checkmark icon for save/confirm actions.
- */
 export function CheckIcon({ size = 18 }: IconProps) {
   return (
     <svg
@@ -91,9 +75,6 @@ export function CheckIcon({ size = 18 }: IconProps) {
   );
 }
 
-/**
- * Edit/pencil icon for editing actions.
- */
 export function EditIcon({ size = 18 }: IconProps) {
   return (
     <svg
@@ -110,9 +91,6 @@ export function EditIcon({ size = 18 }: IconProps) {
   );
 }
 
-/**
- * Trash/delete icon for delete actions.
- */
 export function TrashIcon({ size = 18 }: IconProps) {
   return (
     <svg

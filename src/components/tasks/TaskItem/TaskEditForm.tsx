@@ -29,10 +29,6 @@ interface TaskEditFormProps {
   onCancel: () => void;
 }
 
-/**
- * Form component for editing a task's title.
- * Handles character limit validation and form submission.
- */
 export const TaskEditForm = React.memo(function TaskEditForm({
   initialTitle,
   isLoading,

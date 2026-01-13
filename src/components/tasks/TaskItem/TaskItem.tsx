@@ -23,9 +23,6 @@ interface TaskItemProps {
   onDelete: (id: string) => Promise<void>;
 }
 
-/**
- * Individual task item component with edit and delete functionality.
- */
 export const TaskItem = React.memo(function TaskItem({
   task,
   onToggle,
@@ -69,7 +66,6 @@ export const TaskItem = React.memo(function TaskItem({
     setShowDeleteConfirm(false);
   }, [execute, onDelete, task.id]);
 
-  // Render edit mode
   if (isEditing) {
     return (
       <StyledTaskItem $completed={task.completed}>
@@ -83,7 +79,6 @@ export const TaskItem = React.memo(function TaskItem({
     );
   }
 
-  // Render view mode
   return (
     <>
       <StyledTaskItem $completed={task.completed}>

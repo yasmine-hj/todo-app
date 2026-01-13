@@ -20,7 +20,6 @@ const getErrorMessage = (err: unknown, fallback: string): string =>
   err instanceof Error ? err.message : fallback;
 
 /**
- * Custom hook for managing tasks state and operations.
  * Provides CRUD operations with loading and error states.
  */
 export function useTasks(): UseTasksReturn {
@@ -163,7 +162,7 @@ export function useTasks(): UseTasksReturn {
     try {
       await TaskApi.deleteAll();
     } catch (err) {
-      // Rollback
+      // Rollback on err
       setTasks(previousTasks);
       const message = getErrorMessage(err, "Failed to delete all tasks");
       setError(message);

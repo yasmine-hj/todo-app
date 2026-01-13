@@ -23,10 +23,12 @@ export const TaskList = React.memo(function TaskList({
 }: TaskListProps) {
   const { completedCount, pendingCount, sortedTasks } = useMemo(() => {
     const completed = tasks.filter((t) => t.completed).length;
+
     const sorted = [...tasks].sort((a, b) => {
       if (a.completed === b.completed) return 0;
       return a.completed ? 1 : -1;
     });
+
     return {
       completedCount: completed,
       pendingCount: tasks.length - completed,

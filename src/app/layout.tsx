@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "To-Do List App",
+  title: "Your favourite to-do list",
   description:
     "A simple and elegant to-do list application to manage your tasks!",
 };

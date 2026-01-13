@@ -14,7 +14,7 @@ interface CharacterLimitResult {
 }
 
 /**
- * Hook for managing character limit validation and warnings.
+ * Character limit validation and warnings:
  *
  * @param value - The current input value to validate
  * @param options - Configuration for max length and warning threshold

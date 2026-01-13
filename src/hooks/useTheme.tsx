@@ -33,8 +33,7 @@ const defaultContextValue: ThemeContextValue = {
 const ThemeContext = createContext<ThemeContextValue>(defaultContextValue);
 
 /**
- * Retrieves the theme mode from localStorage or system preference.
- * Only called on the client after mount.
+ * Retrieves the theme mode from localStorage or system preference. Called on the client after mount.
  */
 function getStoredThemeMode(): ThemeMode {
   // Check localStorage first
@@ -51,11 +50,9 @@ interface ThemeProviderProps {
 }
 
 /**
- * Theme provider component that manages light/dark mode state.
- * Persists preference to localStorage and respects system preference.
+ * Theme provider component that manages light/dark mode state. Persists preference to localStorage and respects system preference.
  */
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  // Always start with 'light' to match SSR
   const [themeMode, setThemeModeState] = useState<ThemeMode>("light");
   const [mounted, setMounted] = useState(false);
 

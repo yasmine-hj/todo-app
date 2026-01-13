@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
 /**
- * Custom hook that debounces a value.
  * Returns the debounced value after the specified delay.
  *
  * @param value - The value to debounce

@@ -45,6 +45,7 @@ async function writeTasks(tasks: Task[]): Promise<void> {
 /**
  * Storage layer for task CRUD operations.
  * Uses a JSON file for persistent storage.
+ * TODO: Migrate to a database in the future.
  */
 export const TaskStorage = {
   /**

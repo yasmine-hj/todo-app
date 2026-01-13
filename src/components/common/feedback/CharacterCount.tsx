@@ -14,8 +14,7 @@ interface CharacterCountProps {
 }
 
 /**
- * Displays character count with warning/error states.
- * Only renders when characterCount > 0.
+ * Displays character count with warning/error states -  only shown when characterCount > 0.
  */
 export const CharacterCount = memo(function CharacterCount({
   id,

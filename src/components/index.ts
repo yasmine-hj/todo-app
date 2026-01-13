@@ -1,3 +1,6 @@
+// Layout components
+export { ThemeToggle } from "./layout/ThemeToggle";
+
 // Main app
 export { TodoApp } from "./TodoApp";
 
@@ -5,9 +8,6 @@ export { TodoApp } from "./TodoApp";
 export { TaskForm } from "./tasks/TaskForm";
 export { TaskItem } from "./tasks/TaskItem";
 export { TaskList } from "./tasks/TaskList";
-
-// Layout components
-export { ThemeToggle } from "./layout/ThemeToggle";
 
 // Common components
 export { ErrorBanner, LoadingState, EmptyState } from "./common/feedback";

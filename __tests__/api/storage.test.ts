@@ -138,4 +138,24 @@ describe("TaskStorage", () => {
       expect(deleted).toBe(false);
     });
   });
+
+  describe("deleteAll", () => {
+    it("should delete all tasks", async () => {
+      await TaskStorage.create({ title: "Task 1" });
+      await TaskStorage.create({ title: "Task 2" });
+      await TaskStorage.create({ title: "Task 3" });
+
+      await TaskStorage.deleteAll();
+      const tasks = await TaskStorage.getAll();
+
+      expect(tasks).toEqual([]);
+    });
+
+    it("should work when no tasks exist", async () => {
+      await TaskStorage.deleteAll();
+      const tasks = await TaskStorage.getAll();
+
+      expect(tasks).toEqual([]);
+    });
+  });
 });

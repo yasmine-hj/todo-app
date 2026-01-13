@@ -6,7 +6,7 @@ interface AsyncActionResult {
 }
 
 /**
- * Hook for managing async action loading state.
+ * Async action loading state management:
  *
  * @returns Loading state and execute function
  */

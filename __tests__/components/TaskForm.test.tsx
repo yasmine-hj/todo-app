@@ -115,7 +115,6 @@ describe("TaskForm", () => {
       const longText = "a".repeat(460);
       fireEvent.change(input, { target: { value: longText } });
 
-      // Advance past the 150ms debounce delay
       act(() => {
         jest.advanceTimersByTime(200);
       });
@@ -131,7 +130,6 @@ describe("TaskForm", () => {
       const tooLongText = "a".repeat(510);
       fireEvent.change(input, { target: { value: tooLongText } });
 
-      // Advance past the 150ms debounce delay
       act(() => {
         jest.advanceTimersByTime(200);
       });
