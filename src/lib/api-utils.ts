@@ -39,6 +39,20 @@ function validateTitle(
   return { valid: true, title: title.trim() };
 }
 
+function validatePriority(
+  priority: unknown
+):
+  | { valid: true; priority: "low" | "medium" | "high" }
+  | { valid: false; error: string } {
+  if (priority !== "low" && priority !== "medium" && priority !== "high") {
+    return {
+      valid: false,
+      error: "Priority must be 'low', 'medium', or 'high'",
+    };
+  }
+  return { valid: true, priority };
+}
+
 export function validateCreateTaskPayload(
   body: unknown
 ):
@@ -48,7 +62,7 @@ export function validateCreateTaskPayload(
     return { valid: false, error: "Request body must be an object" };
   }
 
-  const { title } = body as Record<string, unknown>;
+  const { title, priority } = body as Record<string, unknown>;
 
   if (title === undefined) {
     return { valid: false, error: "Title is required" };
@@ -59,7 +73,18 @@ export function validateCreateTaskPayload(
     return titleValidation;
   }
 
-  return { valid: true, payload: { title: titleValidation.title } };
+  const payload: CreateTaskPayload = { title: titleValidation.title };
+
+  // Validate priority if provided
+  if (priority !== undefined) {
+    const priorityValidation = validatePriority(priority);
+    if (!priorityValidation.valid) {
+      return priorityValidation;
+    }
+    payload.priority = priorityValidation.priority;
+  }
+
+  return { valid: true, payload };
 }
 
 export function validateUpdateTaskPayload(
@@ -71,14 +96,16 @@ export function validateUpdateTaskPayload(
     return { valid: false, error: "Request body must be an object" };
   }
 
-  const { title, completed } = body as Record<string, unknown>;
+  const { title, completed, priority } = body as Record<string, unknown>;
   const hasTitle = title !== undefined;
   const hasCompleted = completed !== undefined;
+  const hasPriority = priority !== undefined;
 
-  if (!hasTitle && !hasCompleted) {
+  if (!hasTitle && !hasCompleted && !hasPriority) {
     return {
       valid: false,
-      error: "At least one field (title or completed) must be provided",
+      error:
+        "At least one field (title, completed, or priority) must be provided",
     };
   }
 
@@ -97,6 +124,14 @@ export function validateUpdateTaskPayload(
       return { valid: false, error: "Completed must be a boolean" };
     }
     payload.completed = completed;
+  }
+
+  if (hasPriority) {
+    const priorityValidation = validatePriority(priority);
+    if (!priorityValidation.valid) {
+      return priorityValidation;
+    }
+    payload.priority = priorityValidation.priority;
   }
 
   return { valid: true, payload };

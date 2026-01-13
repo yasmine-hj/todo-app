@@ -71,6 +71,7 @@ export function useTasks(): UseTasksReturn {
       id: tempId,
       title: payload.title,
       completed: false,
+      priority: payload.priority ?? "medium",
       createdAt: now,
       updatedAt: now,
     };

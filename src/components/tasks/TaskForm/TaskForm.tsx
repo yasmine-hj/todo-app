@@ -1,12 +1,15 @@
 "use client";
 
 import React, { useState, useCallback, FormEvent, ChangeEvent } from "react";
+import { Priority } from "@/types";
 import {
   FormWrapper,
   Form,
+  FormActions,
   InputWrapper,
   Input,
   PrimaryButton,
+  PrioritySelect,
 } from "../../styles";
 import { CharacterCount } from "../../common/feedback";
 import { useCharacterLimit } from "@/hooks/useCharacterLimit";
@@ -16,7 +19,7 @@ import { TASK_CONFIG } from "../TaskItem/constants";
 import { isBlank } from "@/lib/string-utils";
 
 interface TaskFormProps {
-  onSubmit: (title: string) => Promise<void>;
+  onSubmit: (title: string, priority: Priority) => Promise<void>;
   disabled?: boolean;
 }
 
@@ -25,6 +28,7 @@ export const TaskForm = React.memo(function TaskForm({
   disabled = false,
 }: TaskFormProps) {
   const [title, setTitle] = useState("");
+  const [priority, setPriority] = useState<Priority>("medium");
   const { isLoading: isSubmitting, execute } = useAsyncAction();
 
   // Debounce title for character validation (avoids excessive recalculations during fast typing)
@@ -54,16 +58,24 @@ export const TaskForm = React.memo(function TaskForm({
       }
 
       await execute(async () => {
-        await onSubmit(trimmedTitle);
+        await onSubmit(trimmedTitle, priority);
         setTitle("");
+        setPriority("medium");
       });
     },
-    [title, execute, onSubmit]
+    [title, priority, execute, onSubmit]
   );
 
   const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
   }, []);
+
+  const handlePriorityChange = useCallback(
+    (e: ChangeEvent<HTMLSelectElement>) => {
+      setPriority(e.target.value as Priority);
+    },
+    []
+  );
 
   return (
     <FormWrapper>
@@ -89,9 +101,21 @@ export const TaskForm = React.memo(function TaskForm({
             warningMessage={warningMessage}
           />
         </InputWrapper>
-        <PrimaryButton type="submit" disabled={isSubmitDisabled}>
-          {isSubmitting ? "Adding..." : "Add Task"}
-        </PrimaryButton>
+        <FormActions>
+          <PrioritySelect
+            value={priority}
+            onChange={handlePriorityChange}
+            disabled={disabled || isSubmitting}
+            aria-label="Task priority"
+          >
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </PrioritySelect>
+          <PrimaryButton type="submit" disabled={isSubmitDisabled}>
+            {isSubmitting ? "Adding..." : "Add"}
+          </PrimaryButton>
+        </FormActions>
       </Form>
     </FormWrapper>
   );

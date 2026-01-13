@@ -8,12 +8,14 @@ import React, {
   ChangeEvent,
   KeyboardEvent,
 } from "react";
+import { Priority } from "@/types";
 import {
   EditFormWrapper,
   EditForm,
   EditInputWrapper,
   EditInput,
   IconButton,
+  PrioritySelect,
 } from "../../styles";
 import { CheckIcon, CloseIcon } from "../../common/icons";
 import { CharacterCount } from "../../common/feedback";
@@ -24,18 +26,21 @@ import { TASK_CONFIG } from "./constants";
 
 interface TaskEditFormProps {
   initialTitle: string;
+  initialPriority: Priority;
   isLoading: boolean;
-  onSave: (title: string) => Promise<void>;
+  onSave: (title: string, priority: Priority) => Promise<void>;
   onCancel: () => void;
 }
 
 export const TaskEditForm = React.memo(function TaskEditForm({
   initialTitle,
+  initialPriority,
   isLoading,
   onSave,
   onCancel,
 }: TaskEditFormProps) {
   const [editTitle, setEditTitle] = useState(initialTitle);
+  const [editPriority, setEditPriority] = useState<Priority>(initialPriority);
 
   // Debounce title for character validation (avoids excessive recalculations during fast typing)
   const debouncedTitle = useDebounce(editTitle, 150);
@@ -58,18 +63,20 @@ export const TaskEditForm = React.memo(function TaskEditForm({
 
       const limitExceeded = trimmedTitle.length > TASK_CONFIG.MAX_LENGTH;
 
-      if (
-        isBlank(trimmedTitle) ||
-        trimmedTitle === initialTitle ||
-        limitExceeded
-      ) {
+      if (isBlank(trimmedTitle) || limitExceeded) {
         onCancel();
         return;
       }
 
-      await onSave(trimmedTitle);
+      // If nothing changed, just cancel
+      if (trimmedTitle === initialTitle && editPriority === initialPriority) {
+        onCancel();
+        return;
+      }
+
+      await onSave(trimmedTitle, editPriority);
     },
-    [editTitle, initialTitle, onSave, onCancel]
+    [editTitle, editPriority, initialTitle, initialPriority, onSave, onCancel]
   );
 
   const handleKeyDown = useCallback(
@@ -84,6 +91,13 @@ export const TaskEditForm = React.memo(function TaskEditForm({
   const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     setEditTitle(e.target.value);
   }, []);
+
+  const handlePriorityChange = useCallback(
+    (e: ChangeEvent<HTMLSelectElement>) => {
+      setEditPriority(e.target.value as Priority);
+    },
+    []
+  );
 
   return (
     <EditFormWrapper>
@@ -102,6 +116,16 @@ export const TaskEditForm = React.memo(function TaskEditForm({
             aria-invalid={isOverLimit}
           />
         </EditInputWrapper>
+        <PrioritySelect
+          value={editPriority}
+          onChange={handlePriorityChange}
+          disabled={isLoading}
+          aria-label="Task priority"
+        >
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </PrioritySelect>
         <IconButton type="submit" disabled={isSaveDisabled} title="Save">
           <CheckIcon />
         </IconButton>

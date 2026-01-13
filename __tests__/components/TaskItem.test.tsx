@@ -6,6 +6,7 @@ const mockTask: Task = {
   id: "1",
   title: "Test task",
   completed: false,
+  priority: "medium",
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
 };
@@ -28,10 +29,25 @@ describe("TaskItem", () => {
     jest.clearAllMocks();
   });
 
-  it("should render task title", () => {
+  it("should render task title and priority badge", () => {
     render(<TaskItem {...defaultProps} />);
 
     expect(screen.getByText("Test task")).toBeInTheDocument();
+    expect(screen.getByText("medium")).toBeInTheDocument();
+  });
+
+  it("should render correct priority badge for high priority task", () => {
+    const highPriorityTask = { ...mockTask, priority: "high" as const };
+    render(<TaskItem {...defaultProps} task={highPriorityTask} />);
+
+    expect(screen.getByText("high")).toBeInTheDocument();
+  });
+
+  it("should render correct priority badge for low priority task", () => {
+    const lowPriorityTask = { ...mockTask, priority: "low" as const };
+    render(<TaskItem {...defaultProps} task={lowPriorityTask} />);
+
+    expect(screen.getByText("low")).toBeInTheDocument();
   });
 
   it("should render checkbox unchecked for incomplete task", () => {
@@ -109,7 +125,7 @@ describe("TaskItem", () => {
     expect(screen.getByDisplayValue("Test task")).toBeInTheDocument();
   });
 
-  it("should call onUpdate with new title when edit is submitted", async () => {
+  it("should call onUpdate with new title and priority when edit is submitted", async () => {
     render(<TaskItem {...defaultProps} />);
 
     const editButton = screen.getByTitle("Edit task");
@@ -122,7 +138,32 @@ describe("TaskItem", () => {
     fireEvent.click(saveButton);
 
     await waitFor(() => {
-      expect(defaultProps.onUpdate).toHaveBeenCalledWith("1", "Updated task");
+      expect(defaultProps.onUpdate).toHaveBeenCalledWith(
+        "1",
+        "Updated task",
+        "medium"
+      );
+    });
+  });
+
+  it("should call onUpdate with changed priority", async () => {
+    render(<TaskItem {...defaultProps} />);
+
+    const editButton = screen.getByTitle("Edit task");
+    fireEvent.click(editButton);
+
+    const prioritySelect = screen.getByLabelText("Task priority");
+    fireEvent.change(prioritySelect, { target: { value: "high" } });
+
+    const saveButton = screen.getByTitle("Save");
+    fireEvent.click(saveButton);
+
+    await waitFor(() => {
+      expect(defaultProps.onUpdate).toHaveBeenCalledWith(
+        "1",
+        "Test task",
+        "high"
+      );
     });
   });
 
@@ -151,7 +192,7 @@ describe("TaskItem", () => {
     expect(screen.getByText("Test task")).toBeInTheDocument();
   });
 
-  it("should not call onUpdate when title is unchanged", async () => {
+  it("should not call onUpdate when title and priority are unchanged", async () => {
     render(<TaskItem {...defaultProps} />);
 
     const editButton = screen.getByTitle("Edit task");

@@ -2,21 +2,20 @@ import { render, screen, fireEvent, waitFor, act } from "../test-utils";
 import { TaskForm } from "@/components";
 
 describe("TaskForm", () => {
-  it("should render input and button", () => {
+  it("should render input, priority select, and button", () => {
     render(<TaskForm onSubmit={jest.fn()} />);
 
     expect(
       screen.getByPlaceholderText("What needs to be done?")
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /add task/i })
-    ).toBeInTheDocument();
+    expect(screen.getByLabelText("Task priority")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /add/i })).toBeInTheDocument();
   });
 
   it("should disable button when input is empty", () => {
     render(<TaskForm onSubmit={jest.fn()} />);
 
-    const button = screen.getByRole("button", { name: /add task/i });
+    const button = screen.getByRole("button", { name: /add/i });
     expect(button).toBeDisabled();
   });
 
@@ -26,26 +25,44 @@ describe("TaskForm", () => {
     const input = screen.getByPlaceholderText("What needs to be done?");
     fireEvent.change(input, { target: { value: "New task" } });
 
-    const button = screen.getByRole("button", { name: /add task/i });
+    const button = screen.getByRole("button", { name: /add/i });
     expect(button).not.toBeDisabled();
   });
 
-  it("should call onSubmit with trimmed title", async () => {
+  it("should call onSubmit with trimmed title and default priority", async () => {
     const onSubmit = jest.fn().mockResolvedValue(undefined);
     render(<TaskForm onSubmit={onSubmit} />);
 
     const input = screen.getByPlaceholderText("What needs to be done?");
     fireEvent.change(input, { target: { value: "  New task  " } });
 
-    const button = screen.getByRole("button", { name: /add task/i });
+    const button = screen.getByRole("button", { name: /add/i });
     fireEvent.click(button);
 
     await waitFor(() => {
-      expect(onSubmit).toHaveBeenCalledWith("New task");
+      expect(onSubmit).toHaveBeenCalledWith("New task", "medium");
     });
   });
 
-  it("should clear input after successful submission", async () => {
+  it("should call onSubmit with selected priority", async () => {
+    const onSubmit = jest.fn().mockResolvedValue(undefined);
+    render(<TaskForm onSubmit={onSubmit} />);
+
+    const input = screen.getByPlaceholderText("What needs to be done?");
+    fireEvent.change(input, { target: { value: "New task" } });
+
+    const prioritySelect = screen.getByLabelText("Task priority");
+    fireEvent.change(prioritySelect, { target: { value: "high" } });
+
+    const button = screen.getByRole("button", { name: /add/i });
+    fireEvent.click(button);
+
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith("New task", "high");
+    });
+  });
+
+  it("should clear input and reset priority after successful submission", async () => {
     const onSubmit = jest.fn().mockResolvedValue(undefined);
     render(<TaskForm onSubmit={onSubmit} />);
 
@@ -54,11 +71,17 @@ describe("TaskForm", () => {
     ) as HTMLInputElement;
     fireEvent.change(input, { target: { value: "New task" } });
 
-    const button = screen.getByRole("button", { name: /add task/i });
+    const prioritySelect = screen.getByLabelText(
+      "Task priority"
+    ) as HTMLSelectElement;
+    fireEvent.change(prioritySelect, { target: { value: "high" } });
+
+    const button = screen.getByRole("button", { name: /add/i });
     fireEvent.click(button);
 
     await waitFor(() => {
       expect(input.value).toBe("");
+      expect(prioritySelect.value).toBe("medium");
     });
   });
 
@@ -69,7 +92,7 @@ describe("TaskForm", () => {
     const input = screen.getByPlaceholderText("What needs to be done?");
     fireEvent.change(input, { target: { value: "   " } });
 
-    const button = screen.getByRole("button", { name: /add task/i });
+    const button = screen.getByRole("button", { name: /add/i });
     fireEvent.click(button);
 
     expect(onSubmit).not.toHaveBeenCalled();
@@ -79,9 +102,11 @@ describe("TaskForm", () => {
     render(<TaskForm onSubmit={jest.fn()} disabled />);
 
     const input = screen.getByPlaceholderText("What needs to be done?");
-    const button = screen.getByRole("button", { name: /add task/i });
+    const prioritySelect = screen.getByLabelText("Task priority");
+    const button = screen.getByRole("button", { name: /add/i });
 
     expect(input).toBeDisabled();
+    expect(prioritySelect).toBeDisabled();
     expect(button).toBeDisabled();
   });
 
@@ -150,7 +175,7 @@ describe("TaskForm", () => {
         jest.advanceTimersByTime(200);
       });
 
-      const button = screen.getByRole("button", { name: /add task/i });
+      const button = screen.getByRole("button", { name: /add/i });
       expect(button).toBeDisabled();
     });
 
@@ -162,7 +187,7 @@ describe("TaskForm", () => {
       const tooLongText = "a".repeat(510);
       fireEvent.change(input, { target: { value: tooLongText } });
 
-      const button = screen.getByRole("button", { name: /add task/i });
+      const button = screen.getByRole("button", { name: /add/i });
       fireEvent.click(button);
 
       expect(onSubmit).not.toHaveBeenCalled();

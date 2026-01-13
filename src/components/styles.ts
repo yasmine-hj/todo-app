@@ -97,6 +97,27 @@ export const Form = styled.form`
   display: flex;
   gap: 0.75rem;
   align-items: flex-start;
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+
+    & > * {
+      width: 100%;
+    }
+  }
+`;
+
+export const FormActions = styled.div`
+  display: flex;
+  gap: 0.75rem;
+
+  @media (max-width: 480px) {
+    width: 100%;
+
+    & > * {
+      flex: 1;
+    }
+  }
 `;
 
 export const InputWrapper = styled.div`
@@ -266,6 +287,10 @@ export const Checkbox = styled.input.attrs({ type: "checkbox" })`
   cursor: pointer;
   accent-color: ${({ theme }) => theme.colors.primary};
   flex-shrink: 0;
+
+  @media (max-width: 480px) {
+    order: -2;
+  }
 `;
 
 interface TaskTitleProps {
@@ -279,12 +304,106 @@ export const TaskTitle = styled.span<TaskTitleProps>`
   word-break: break-word;
   transition: color 0.3s ease;
 
+  @media (max-width: 480px) {
+    order: -1;
+    flex-basis: calc(100% - 3rem);
+  }
+
   ${({ $completed, theme }) =>
     $completed &&
     css`
       text-decoration: line-through;
       color: ${theme.colors.textMuted};
     `}
+`;
+
+interface PriorityBadgeProps {
+  $priority: "low" | "medium" | "high";
+}
+
+const priorityStyles = {
+  low: {
+    light: { bg: "#ecfdf5", text: "#047857", border: "#a7f3d0" },
+    dark: {
+      bg: "rgba(16, 185, 129, 0.15)",
+      text: "#6ee7b7",
+      border: "rgba(16, 185, 129, 0.3)",
+    },
+  },
+  medium: {
+    light: { bg: "#fffbeb", text: "#d97706", border: "#fde68a" },
+    dark: {
+      bg: "rgba(245, 158, 11, 0.15)",
+      text: "#fcd34d",
+      border: "rgba(245, 158, 11, 0.3)",
+    },
+  },
+  high: {
+    light: { bg: "#fef2f2", text: "#dc2626", border: "#fecaca" },
+    dark: {
+      bg: "rgba(239, 68, 68, 0.15)",
+      text: "#fca5a5",
+      border: "rgba(239, 68, 68, 0.3)",
+    },
+  },
+};
+
+export const PriorityBadge = styled.span<PriorityBadgeProps>`
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+  border: 1px solid;
+  transition: all 0.2s ease;
+
+  ${({ $priority, theme }) => {
+    const priority = $priority || "medium";
+    const mode = theme?.mode || "light";
+    const style = priorityStyles[priority][mode];
+    return css`
+      background-color: ${style.bg};
+      color: ${style.text};
+      border-color: ${style.border};
+    `;
+  }}
+`;
+
+export const PrioritySelect = styled.select`
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 2px solid ${({ theme }) => theme.colors.border};
+  border-radius: 8px;
+  background-color: ${({ theme }) => theme.colors.surface};
+  color: ${({ theme }) => theme.colors.text};
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 110px;
+
+  @media (max-width: 480px) {
+    flex: 1;
+  }
+
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.primary};
+  }
+
+  &:focus {
+    outline: none;
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 3px
+      ${({ theme }) =>
+        theme.mode === "dark"
+          ? "rgba(96, 165, 250, 0.2)"
+          : "rgba(59, 130, 246, 0.2)"};
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 `;
 
 export const TaskActions = styled.div`
@@ -303,6 +422,13 @@ export const EditForm = styled.form`
   display: flex;
   gap: 0.5rem;
   align-items: flex-start;
+  flex-wrap: wrap;
+
+  @media (max-width: 480px) {
+    & > div:first-child {
+      flex-basis: 100%;
+    }
+  }
 `;
 
 export const EditInputWrapper = styled.div`
@@ -382,6 +508,67 @@ export const EmptySubtext = styled.p`
   color: ${({ theme }) => theme.colors.textLight};
   margin: 0;
   transition: color 0.3s ease;
+`;
+
+export const FilterBar = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+
+  @media (max-width: 480px) {
+    justify-content: space-between;
+
+    & > button {
+      flex: 1;
+      min-width: 0;
+    }
+  }
+`;
+
+interface FilterButtonProps {
+  $active?: boolean;
+  $variant?: "all" | "low" | "medium" | "high";
+}
+
+const filterVariantColors = {
+  all: { light: "#3b82f6", dark: "#60a5fa" },
+  low: { light: "#047857", dark: "#6ee7b7" },
+  medium: { light: "#d97706", dark: "#fcd34d" },
+  high: { light: "#dc2626", dark: "#fca5a5" },
+};
+
+export const FilterButton = styled.button<FilterButtonProps>`
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid;
+
+  ${({ $active, $variant = "all", theme }) => {
+    const color = filterVariantColors[$variant][theme.mode];
+
+    if ($active) {
+      return css`
+        background-color: ${color};
+        border-color: ${color};
+        color: ${theme.mode === "dark" ? "#1f2937" : "#ffffff"};
+      `;
+    }
+
+    return css`
+      background-color: transparent;
+      border-color: ${theme.colors.border};
+      color: ${theme.colors.textMuted};
+
+      &:hover {
+        border-color: ${color};
+        color: ${color};
+      }
+    `;
+  }}
 `;
 
 export const LoadingContainer = styled.div`

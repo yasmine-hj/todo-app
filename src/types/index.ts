@@ -1,4 +1,5 @@
 export type {
+  Priority,
   Task,
   CreateTaskPayload,
   UpdateTaskPayload,

@@ -1,12 +1,12 @@
 import React, { useMemo } from "react";
-import { Task } from "@/types/task";
+import { Task, Priority } from "@/types/task";
 import { StatsBar, StatText, TaskList as StyledTaskList } from "../../styles";
 import { TaskItem } from "../TaskItem";
 
 interface TaskListProps {
   tasks: Task[];
   onToggle: (id: string, completed: boolean) => Promise<void>;
-  onUpdate: (id: string, title: string) => Promise<void>;
+  onUpdate: (id: string, title: string, priority: Priority) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
   showStats?: boolean;
 }

@@ -19,16 +19,35 @@ describe("TaskStorage", () => {
   });
 
   describe("create", () => {
-    it("should create a new task with correct properties", async () => {
+    it("should create a new task with correct properties and default priority", async () => {
       const task = await TaskStorage.create({ title: "Test task" });
 
       expect(task).toMatchObject({
         title: "Test task",
         completed: false,
+        priority: "medium",
       });
       expect(task.id).toBeDefined();
       expect(task.createdAt).toBeDefined();
       expect(task.updatedAt).toBeDefined();
+    });
+
+    it("should create a task with specified priority", async () => {
+      const task = await TaskStorage.create({
+        title: "High priority task",
+        priority: "high",
+      });
+
+      expect(task.priority).toBe("high");
+    });
+
+    it("should create a task with low priority", async () => {
+      const task = await TaskStorage.create({
+        title: "Low priority task",
+        priority: "low",
+      });
+
+      expect(task.priority).toBe("low");
     });
 
     it("should trim whitespace from title", async () => {
@@ -86,6 +105,7 @@ describe("TaskStorage", () => {
 
       expect(updated?.title).toBe("Updated title");
       expect(updated?.completed).toBe(false);
+      expect(updated?.priority).toBe("medium");
     });
 
     it("should update task completed status", async () => {
@@ -95,6 +115,37 @@ describe("TaskStorage", () => {
 
       expect(updated?.completed).toBe(true);
       expect(updated?.title).toBe("Test task");
+    });
+
+    it("should update task priority", async () => {
+      const created = await TaskStorage.create({
+        title: "Test task",
+        priority: "low",
+      });
+
+      const updated = await TaskStorage.update(created.id, {
+        priority: "high",
+      });
+
+      expect(updated?.priority).toBe("high");
+      expect(updated?.title).toBe("Test task");
+    });
+
+    it("should update multiple fields including priority", async () => {
+      const created = await TaskStorage.create({
+        title: "Original",
+        priority: "low",
+      });
+
+      const updated = await TaskStorage.update(created.id, {
+        title: "Updated",
+        priority: "high",
+        completed: true,
+      });
+
+      expect(updated?.title).toBe("Updated");
+      expect(updated?.priority).toBe("high");
+      expect(updated?.completed).toBe(true);
     });
 
     it("should update the updatedAt timestamp", async () => {

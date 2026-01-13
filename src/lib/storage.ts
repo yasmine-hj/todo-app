@@ -89,6 +89,7 @@ export const TaskStorage = {
       id: uuidv4(),
       title,
       completed: false,
+      priority: payload.priority ?? "medium",
       createdAt: now,
       updatedAt: now,
     };
@@ -116,6 +117,7 @@ export const TaskStorage = {
       ...tasks[index],
       ...(payload.title !== undefined && { title: payload.title.trim() }),
       ...(payload.completed !== undefined && { completed: payload.completed }),
+      ...(payload.priority !== undefined && { priority: payload.priority }),
       updatedAt: new Date().toISOString(),
     };
 

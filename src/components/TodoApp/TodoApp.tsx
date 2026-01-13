@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
+import { Priority } from "@/types";
 import { useTasks } from "@/hooks/useTasks";
 import { useTheme } from "@/hooks/useTheme";
 import { TaskForm } from "../tasks/TaskForm";
@@ -18,7 +19,11 @@ import {
   StatsBar,
   StatText,
   DangerButton,
+  FilterBar,
+  FilterButton,
 } from "../styles";
+
+type PriorityFilter = "all" | Priority;
 
 /**
  * Main application component - orchestrates task management and renders the UI.
@@ -40,6 +45,7 @@ export function TodoApp() {
 
   const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [priorityFilter, setPriorityFilter] = useState<PriorityFilter>("all");
 
   const handleDeleteAllClick = useCallback(() => {
     setShowDeleteAllDialog(true);
@@ -62,15 +68,15 @@ export function TodoApp() {
   }, []);
 
   const handleCreateTask = useCallback(
-    async (title: string) => {
-      await createTask({ title });
+    async (title: string, priority: Priority) => {
+      await createTask({ title, priority });
     },
     [createTask]
   );
 
   const handleUpdateTask = useCallback(
-    async (id: string, title: string) => {
-      await updateTask(id, { title });
+    async (id: string, title: string, priority: Priority) => {
+      await updateTask(id, { title, priority });
     },
     [updateTask]
   );
@@ -82,6 +88,15 @@ export function TodoApp() {
     [toggleTask]
   );
 
+  const filteredTasks = useMemo(() => {
+    if (priorityFilter === "all") {
+      return tasks;
+    }
+    return tasks.filter(
+      (task) => (task.priority || "medium") === priorityFilter
+    );
+  }, [tasks, priorityFilter]);
+
   const content = useMemo(() => {
     if (isLoading) {
       return <LoadingState />;
@@ -91,15 +106,32 @@ export function TodoApp() {
       return <EmptyState />;
     }
 
+    if (filteredTasks.length === 0) {
+      return (
+        <EmptyState
+          icon="🔍"
+          title="No tasks found"
+          subtitle={`No ${priorityFilter} priority tasks`}
+        />
+      );
+    }
+
     return (
       <TaskList
-        tasks={tasks}
+        tasks={filteredTasks}
         onToggle={handleToggleTask}
         onUpdate={handleUpdateTask}
         onDelete={deleteTask}
       />
     );
-  }, [isLoading, tasks, handleToggleTask, handleUpdateTask, deleteTask]);
+  }, [
+    isLoading,
+    tasks,
+    filteredTasks,
+    handleToggleTask,
+    handleUpdateTask,
+    deleteTask,
+  ]);
 
   return (
     <PageWrapper>
@@ -115,6 +147,39 @@ export function TodoApp() {
         {error && <ErrorBanner message={error} onDismiss={clearError} />}
 
         <TaskForm onSubmit={handleCreateTask} disabled={isLoading} />
+
+        {tasks.length > 0 && (
+          <FilterBar>
+            <FilterButton
+              $active={priorityFilter === "all"}
+              $variant="all"
+              onClick={() => setPriorityFilter("all")}
+            >
+              All
+            </FilterButton>
+            <FilterButton
+              $active={priorityFilter === "high"}
+              $variant="high"
+              onClick={() => setPriorityFilter("high")}
+            >
+              High
+            </FilterButton>
+            <FilterButton
+              $active={priorityFilter === "medium"}
+              $variant="medium"
+              onClick={() => setPriorityFilter("medium")}
+            >
+              Medium
+            </FilterButton>
+            <FilterButton
+              $active={priorityFilter === "low"}
+              $variant="low"
+              onClick={() => setPriorityFilter("low")}
+            >
+              Low
+            </FilterButton>
+          </FilterBar>
+        )}
 
         {tasks.length > 1 && (
           <StatsBar>

@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useCallback, useState } from "react";
-import { Task } from "@/types";
+import { Task, Priority } from "@/types";
 import {
   TaskItem as StyledTaskItem,
   Checkbox,
   TaskTitle,
   TaskActions,
   IconButton,
+  PriorityBadge,
 } from "../../styles";
 import { ConfirmDialog } from "../../common/dialog";
 import { EditIcon, TrashIcon } from "../../common/icons";
@@ -19,7 +20,7 @@ import { truncate } from "@/lib/string-utils";
 interface TaskItemProps {
   task: Task;
   onToggle: (id: string, completed: boolean) => Promise<void>;
-  onUpdate: (id: string, title: string) => Promise<void>;
+  onUpdate: (id: string, title: string, priority: Priority) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
 }
 
@@ -46,8 +47,8 @@ export const TaskItem = React.memo(function TaskItem({
   }, []);
 
   const handleSave = useCallback(
-    async (title: string) => {
-      await execute(() => onUpdate(task.id, title));
+    async (title: string, priority: Priority) => {
+      await execute(() => onUpdate(task.id, title, priority));
       setIsEditing(false);
     },
     [execute, onUpdate, task.id]
@@ -71,6 +72,7 @@ export const TaskItem = React.memo(function TaskItem({
       <StyledTaskItem $completed={task.completed}>
         <TaskEditForm
           initialTitle={task.title}
+          initialPriority={task.priority || "medium"}
           isLoading={isLoading}
           onSave={handleSave}
           onCancel={cancelEditing}
@@ -91,6 +93,9 @@ export const TaskItem = React.memo(function TaskItem({
           }
         />
         <TaskTitle $completed={task.completed}>{task.title}</TaskTitle>
+        <PriorityBadge $priority={task.priority || "medium"}>
+          {task.priority || "medium"}
+        </PriorityBadge>
         <TaskActions>
           <IconButton
             onClick={startEditing}
