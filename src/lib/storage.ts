@@ -31,14 +31,18 @@ async function ensureDataFile(): Promise<void> {
 async function readTasks(): Promise<Task[]> {
   await ensureDataFile();
   const data = await fs.readFile(DATA_FILE, "utf-8");
-  return JSON.parse(data) as Task[];
+  try {
+    const parsed = JSON.parse(data);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return []; // Return empty array if JSON is corrupted
+  }
 }
 
 /**
  * Writes tasks to the JSON file.
  */
 async function writeTasks(tasks: Task[]): Promise<void> {
-  await ensureDataFile();
   await fs.writeFile(DATA_FILE, JSON.stringify(tasks, null, 2), "utf-8");
 }
 
@@ -75,10 +79,15 @@ export const TaskStorage = {
   async create(payload: CreateTaskPayload): Promise<Task> {
     const tasks = await readTasks();
     const now = new Date().toISOString();
+    const title = payload.title.trim();
+
+    if (!title) {
+      throw new Error("Task title cannot be empty");
+    }
 
     const newTask: Task = {
       id: uuidv4(),
-      title: payload.title.trim(),
+      title,
       completed: false,
       createdAt: now,
       updatedAt: now,
@@ -138,6 +147,7 @@ export const TaskStorage = {
    * Deletes all tasks.
    */
   async deleteAll(): Promise<void> {
+    await ensureDataFile();
     await writeTasks([]); // Update the storage with an empty array
   },
 };
