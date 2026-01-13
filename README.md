@@ -2,8 +2,6 @@
 
 A simple, elegant to-do list application built with Next.js and TypeScript.
 
-![To-Do App Demo](demo.gif)
-
 ## Features
 
 - **Create tasks** with customizable priority levels (Low, Medium, High)
